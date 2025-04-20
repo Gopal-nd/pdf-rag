@@ -1,0 +1,17 @@
+
+services:
+
+  pdf-rag-db:
+    image: postgres:14
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: db
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      
+volumes:
+  pg_data:
