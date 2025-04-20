@@ -16,7 +16,6 @@ export const auth = betterAuth({
     
     },
     
-    redirectTo: "http://localhost:3000/dashboard",
     
     trustedOrigins: [ "http://localhost:3000", "http://localhost:5000" ],
     

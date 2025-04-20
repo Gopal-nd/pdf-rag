@@ -52,7 +52,7 @@ export default function SignIn() {
                     await signIn.social(
                     {
                       provider: "github",
-                      callbackURL: "http://localhost:3000/dashboard"
+                      callbackURL: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`
                       
                     },
                     {
