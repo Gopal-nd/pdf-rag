@@ -1,20 +1,27 @@
 import express from "express";
-import type {Request, Response } from "express";
-
+import type {Request, Response,NextFunction } from "express";
+import chatRoute from "./routes/chat.route";
+import uploadRoute from "./routes/upload.route";
 import { auth } from "@/lib/auth";
-import cors from "cors"; // Import the CORS middleware
+import cors from "cors"; 
 import { toNodeHandler, fromNodeHeaders } from "better-auth/node";
+import errorHandler from "./middleware/errorHandler";
 const app = express();
 const port = 5000
 app.use(
 	cors({
-		origin: ["http://localhost:3000"], // Replace with your frontend's origin
-		methods: ["GET", "POST", "PUT", "DELETE"], // Specify allowed HTTP methods
-		credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+		origin: ["http://localhost:3000"], 
+		methods: ["GET", "POST", "PUT", "DELETE"], 
+		credentials: true,
 		
 	})
 );
 app.all("/api/auth/*splat", toNodeHandler(auth)); 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.use('/chat', chatRoute);
+app.use('/upload', uploadRoute);
 
  
 app.get("/api/me", async (req:Request, res:any) => {
@@ -24,10 +31,9 @@ app.get("/api/me", async (req:Request, res:any) => {
    return res.json(session);
 });
 
-// Mount express json middleware after Better Auth handler
-// or only apply it to routes that don't interact with Better Auth
-app.use(express.json());
- 
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+	errorHandler(err, req, res, next);
+  });
 app.listen(port, () => {
 	console.log(`Example app listening on port ${port}`);
 });

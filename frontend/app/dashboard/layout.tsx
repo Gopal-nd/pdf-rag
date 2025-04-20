@@ -15,6 +15,7 @@ import {
   CircleDollarSign,
 
   CircleUser,
+  FileText,
 
 } from "lucide-react";
 import NavbarProfile from "@/components/NavbarProfile";
@@ -74,12 +75,12 @@ export default function Component({ children }: { children: React.ReactNode }) {
     </nav>
   );
   return (
-    <div className="min-h-screen mx-auto">
+    <div className="min-h-screen mx-auto ">
       <header className="flex items-center justify-between p-2 border-b">
         <div className="flex gap-10">
           <Link href="/dashboard" className="flex items-center space-x-2">
             <span className="text-2xl font-bold text-primary flex gap-1 items-center">
-            <CircleDollarSign /> FinGenAI
+            <FileText />PDF AI
             </span>
           </Link>
           {isLargeScreen && (
@@ -116,7 +117,7 @@ export default function Component({ children }: { children: React.ReactNode }) {
           )}
         </div>
       </header>
-      <div className="flex">
+      <div className="flex h-[100%]">
         {isLargeScreen && (
           <aside
             className={`transition-all duration-300 ease-in-out ${isSidebarOpen ? "w-64" : "w-0"}`}
@@ -128,7 +129,7 @@ export default function Component({ children }: { children: React.ReactNode }) {
             </div>
           </aside>
         )}
-        <main className="flex-1 p-4">{children}</main>
+        <main className="flex-1 ">{children}</main>
       </div>
     </div>
   );
