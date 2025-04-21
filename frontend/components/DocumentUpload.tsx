@@ -18,13 +18,13 @@ const DocumentUpload = () => {
     mutationFn: async (file: File) => {
       const formData = new FormData();
       formData.append("document", file);
-      const res = await axiosInstance.post("/upload", formData);
+      const res = await axiosInstance.post("/api/upload/new", formData);
+      console.log(res.data.data);
+      alert('res: '+res.data.data);
       return res.data.filename;
     },
     onSuccess: (filename) => {
-      const url = `http://localhost:5000/uploads/${filename}`;
-      setPdfUrl(url);
-      setSelectedFile(null); // reset the file input
+   
     },
   });
 
@@ -83,13 +83,15 @@ const DocumentUpload = () => {
         </button>
       </div>
 
-      {pdfUrl && (
-        <div className="mt-6 border rounded p-4  shadow">
-          <h2 className="text-lg font-semibold mb-3">PDF Preview</h2>
-          <Document file={pdfUrl} onLoadError={console.error}>
-            <Page pageNumber={1} />
-          </Document>
-        </div>
+      {selectedFile && (
+  <div className="mt-6 border rounded p-4 shadow">
+    <h2 className="text-lg font-semibold mb-3">PDF Preview</h2>
+    <iframe
+      src={URL.createObjectURL(selectedFile)}
+      className="w-full h-[400px] border"
+      title="PDF Preview"
+    ></iframe>
+  </div>
       )}
     </div>
   );

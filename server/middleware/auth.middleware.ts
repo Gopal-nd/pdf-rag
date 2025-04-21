@@ -9,7 +9,8 @@ export const checkAuth = async(req: any, res: Response, next: NextFunction): Pro
   const session = await auth.api.getSession({
      headers: fromNodeHeaders(req.headers),
    });
-   if(!session) {
+   console.log('session',session?.user.id)
+   if(!session?.user.id) {
     console.log('no session ,unauthorized check auth')
    res.status(403).json(new ApiResponse({
     statusCode: 403,

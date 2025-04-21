@@ -2,6 +2,10 @@
   "name": "server",
   "module": "index.ts",
   "type": "module",
+  "scripts": {
+    "dev": "bun run --watch index.ts",
+    "worker": "bun run --watch worker.ts"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },
@@ -9,12 +13,20 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
+    "@langchain/community": "^0.3.34",
+    "@langchain/core": "^0.3.42",
+    "@langchain/google-genai": "^0.1.10",
+    "@langchain/qdrant": "^0.1.2",
     "@prisma/client": "^6.6.0",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.1",
     "better-auth": "^1.2.7",
+    "bullmq": "^5.49.1",
     "cors": "^2.8.5",
     "express": "^5.1.0",
+    "install": "^0.13.0",
+    "langchain": "^0.3.23",
+    "pdf-parse": "^1.1.1",
     "prisma": "^6.6.0"
   }
 }
