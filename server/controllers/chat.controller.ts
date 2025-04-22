@@ -9,7 +9,7 @@ const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY });
 
 
 export const newChat = asyncHandler(async (req, res) => {
-    const query = req.query.q
+    const query = req.query.query as string
     console.log(query)
     if(!query) {
         return res.status(400).json(new ApiResponse({
@@ -18,7 +18,7 @@ export const newChat = asyncHandler(async (req, res) => {
             message: 'query is required'
         }));
     }
-    const userQuery = "what are the skills mentioned in the resume?"
+
     const embeddings = new GoogleGenerativeAIEmbeddings({
         model: "text-embedding-004", // 768 dimensions
         apiKey: process.env.GOOGLE_API_KEY
@@ -32,7 +32,7 @@ export const newChat = asyncHandler(async (req, res) => {
         k:2,
       })
 
-      const result = await response.invoke(userQuery)
+      const result = await response.invoke( query!)
       const system_prompt =` you are helpfull ai assistant who answeres the user query based on the avialablle context from pdf file 
       Context:
       ${JSON.stringify(result)}`
@@ -50,7 +50,7 @@ export const newChat = asyncHandler(async (req, res) => {
 
     res.json(new ApiResponse({
         statusCode: 200,
-        data: aiResponse.text,
+        data: {res:aiResponse.text,docs:result},
         message: 'success'
     }));
 });

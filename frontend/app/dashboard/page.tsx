@@ -1,3 +1,4 @@
+import ChatComponent from "@/components/ChatComponent"
 import DocumentUpload from "@/components/DocumentUpload"
 import {
   ResizableHandle,
@@ -20,9 +21,9 @@ export default function ResizableDemo() {
       </ResizablePanel >
       <ResizableHandle withHandle />
       <ResizablePanel defaultSize={75}>
-        <div className="flex h-full items-center justify-center p-6">
-          <span className="font-semibold">Content</span>
-        </div>
+
+        <ChatComponent />
+    
       </ResizablePanel>
     </ResizablePanelGroup>
         </div>
