@@ -3,7 +3,6 @@ import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
 
 import { QdrantVectorStore } from "@langchain/qdrant";
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
-import { QdrantClient } from "@qdrant/js-client-rest";
 
 const worker = new Worker("file-upload-queue",
     async (job: any) => {
@@ -15,27 +14,29 @@ const worker = new Worker("file-upload-queue",
         // read the pdf from the path
         console.log('documents are ',docs)
         console.log('embeddings are ')
+        console.log("GOOGLE_API_KEY:", process.env.GOOGLE_API_KEY);
+
 
         const embeddings = new GoogleGenerativeAIEmbeddings({
-            model: "text-embedding-001", // 768 dimensions
+            model: "text-embedding-004", // 768 dimensions
             apiKey: process.env.GOOGLE_API_KEY
           });
-          const res = await embeddings.embedQuery(
-            "What would be a good company name for a company that makes colorful socks?"
-          );
-          console.log({ res });
-          console.log('embeddings are ',embeddings)
         console.log('passed l0')
-        const client = new QdrantClient({ url: 'http://localhost:6333' });
-
-        const vectorStore = await QdrantVectorStore.fromDocuments(docs, embeddings, {
-            client,
-            collectionName: "movie-collection",
+        // console.log('embeddings are ',embeddings)
+  
+        try {
+          const vectorStore = await QdrantVectorStore.fromExistingCollection(embeddings, {
+            url: 'http://localhost:6333',
+            collectionName: "langchain-testing",
           });
-        console.log('passed l1')
-       const output =  await vectorStore.addDocuments(docs);
-       console.log('output:',output)
-        console.log('passed l2')
+
+          const output = await vectorStore.addDocuments(docs);
+
+        } catch (err) {
+          console.error("Error during Qdrant vector store setup:", err);
+        }
+        
+        console.log('passed all docs added tothe vector store')
 
         console.log('Jobs', job.data)
 
