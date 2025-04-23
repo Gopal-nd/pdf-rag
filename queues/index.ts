@@ -1,0 +1,63 @@
+import { Worker } from "bullmq";
+import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
+import fs from "fs/promises";
+import axios from "axios";
+import path from "path";
+import os from "os";
+import { QdrantVectorStore } from "@langchain/qdrant";
+import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
+
+const worker = new Worker(
+  "file-upload-queue",
+  async (job: any) => {
+    let tempFilePath: string | null = null;
+
+    try {
+      const data = JSON.parse(job.data);
+
+      // Step 1: Download to temp file
+      const tempDir = os.tmpdir();
+      tempFilePath = path.join(tempDir, `${Date.now()}-${data.filename}`);
+      const response = await axios.get(data.path, { responseType: "arraybuffer" });
+
+      await fs.writeFile(tempFilePath, response.data);
+      console.log("✅ File downloaded to:", tempFilePath);
+
+      // Step 2: Load and embed
+      const loader = new PDFLoader(tempFilePath);
+      const docs = await loader.load();
+      console.log("📄 Loaded documents:", docs.length);
+
+      const embeddings = new GoogleGenerativeAIEmbeddings({
+        model: "text-embedding-004",
+        apiKey: process.env.GOOGLE_API_KEY!,
+      });
+
+      const vectorStore = await QdrantVectorStore.fromExistingCollection(embeddings, {
+        url: "http://localhost:6333",
+        collectionName: "langchain-testing",
+      });
+
+      await vectorStore.addDocuments(docs);
+      console.log("✅ Documents added to Qdrant");
+    } catch (err) {
+      console.error("❌ Error during processing:", err);
+    } finally {
+      // Step 3: Cleanup
+      if (tempFilePath) {
+        try {
+          await fs.unlink(tempFilePath);
+          console.log("🧹 Temp file cleaned:", tempFilePath);
+        } catch (cleanupErr) {
+          console.error("⚠️ Failed to clean temp file:", cleanupErr);
+        }
+      }
+    }
+
+    console.log("📦 Job data:", job.data);
+  },
+  {
+    concurrency: 100,
+    connection: { host: "localhost", port: 6379 },
+  }
+);

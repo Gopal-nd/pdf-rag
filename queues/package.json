@@ -1,0 +1,22 @@
+{
+  "name": "queues",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "bun run --watch index.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@langchain/community": "^0.3.41",
+    "@langchain/google-genai": "^0.2.4",
+    "@langchain/qdrant": "^0.1.2",
+    "bullmq": "^5.49.2",
+    "pdf-parse": "^1.1.1"
+  }
+}
