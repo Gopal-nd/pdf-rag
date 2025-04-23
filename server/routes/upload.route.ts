@@ -17,7 +17,7 @@ const storage = multer.diskStorage({
   
   const upload = multer({
     storage: storage,
-    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+    limits: { fileSize: 20 * 1024 * 1024 }, // 5MB limit
     fileFilter: (req, file, cb) => {
       if (file.mimetype === 'application/pdf') {
         cb(null, true);
@@ -27,7 +27,9 @@ const storage = multer.diskStorage({
     },
   });
 
-router.post('/new',upload.single('document'), newUpload);
+ 
+
+router.post('/new', upload.single('document'), newUpload);
 
 export default router;
 

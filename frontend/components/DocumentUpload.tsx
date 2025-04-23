@@ -20,7 +20,7 @@ const DocumentUpload = () => {
       formData.append("document", file);
       const res = await axiosInstance.post("/api/upload/new", formData);
       console.log(res.data.data);
-      alert('res: '+res.data.data);
+      setPdfUrl(res.data.data);
       return res.data.filename;
     },
     onSuccess: (filename) => {
@@ -44,8 +44,10 @@ const DocumentUpload = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6">
-      <div className="border-2 border-dashed  rounded-lg p-6 text-center  transition">
+    <div className="w-[100%] h-[100%] mx-auto p-1">
+   {  !pdfUrl && 
+   <>
+   <div className="border-2 border-dashed  rounded-lg p-6 text-center  transition">
         <label
           htmlFor="pdf-upload"
           className="flex flex-col items-center justify-center space-y-2 cursor-pointer"
@@ -77,22 +79,27 @@ const DocumentUpload = () => {
           onClick={handleUpload}
           disabled={!selectedFile || mutation.isPending}
           className="flex items-center gap-2 bg-blue-600  px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
-        >
+          >
           {mutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
           Upload PDF
         </button>
       </div>
+   </>
 
-      {selectedFile && (
-  <div className="mt-6 border rounded p-4 shadow">
-    <h2 className="text-lg font-semibold mb-3">PDF Preview</h2>
+        }
+
+
+    {
+      pdfUrl &&<>
     <iframe
-      src={URL.createObjectURL(selectedFile)}
-      className="w-full h-[400px] border"
-      title="PDF Preview"
+    src={pdfUrl!}
+    className="w-full h-full border"
+    title="PDF Preview"
     ></iframe>
-  </div>
-      )}
+  
+    </>
+    }
+    
     </div>
   );
 };
