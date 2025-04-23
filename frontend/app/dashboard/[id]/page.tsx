@@ -20,13 +20,13 @@ export default function ResizableDemo() {
       <ResizablePanel defaultSize={25}>
         <div className="flex h-full items-center justify-center p-6">
           {/* // create a form to upload the pdf using react query to /backend/api/upload  */}
-          <DocumentUpload id={id}/>
+          <DocumentUpload id={id as string}/>
         </div>
       </ResizablePanel >
       <ResizableHandle withHandle />
       <ResizablePanel defaultSize={75}>
 
-        <ChatComponent />
+        <ChatComponent id={id as string} />
     
       </ResizablePanel>
     </ResizablePanelGroup>

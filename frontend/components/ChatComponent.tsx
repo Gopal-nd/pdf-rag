@@ -11,7 +11,7 @@ const dummyMessages = [
     { type: 'bot', text: 'Hello! How can I help you today?' },
 ];
 
-const ChatComponent = () => {
+const ChatComponent = ({id}:{id:string}) => {
   const [messages, setMessages] = useState(dummyMessages);
   const [input, setInput] = useState('');
   const [res, setRes] = useState<any>();
@@ -21,7 +21,7 @@ const ChatComponent = () => {
   const handleSend = async() => {
     if (!input.trim()) return;
     
-    const response =await axiosInstance.get(`/api/chat/new?query=${input}`);
+    const response =await axiosInstance.get(`/api/chat/new?query=${input}`,{params:{id}});
     setMessages((prevMessages) => [...prevMessages, { type: 'user', text: input }]);
      console.log(response.data.data)
      const data = response.data.data

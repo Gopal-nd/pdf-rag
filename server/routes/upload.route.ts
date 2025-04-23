@@ -1,7 +1,7 @@
 import express from 'express';
 
 import {  checkAuth } from '@/middleware/auth.middleware';
-import { newUpload } from '@/controllers/upload.controller';
+import { getFiles, newUpload } from '@/controllers/upload.controller';
 import multer from 'multer';
 
 const router = express.Router();
@@ -30,6 +30,8 @@ const storage = multer.diskStorage({
  
 
 router.post('/new', upload.single('document'), newUpload);
+router.get('/', checkAuth, getFiles);
+
 
 export default router;
 

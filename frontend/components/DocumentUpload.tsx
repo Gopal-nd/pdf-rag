@@ -7,16 +7,20 @@ import { Document, Page, pdfjs } from "react-pdf";
 import { UploadCloud, Loader2 } from "lucide-react";
 import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 import axiosInstance from "@/lib/axios";
+import DocumentAccordion from "./DocumentList";
+import { Button } from "./ui/button";
+
 
 
 const DocumentUpload = ({id}:{id:string}) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
 
-  const {} = useQuery({
+  const {data} = useQuery({
     queryKey:["documets",id],
     queryFn: async () => {
-      const res = await axiosInstance.get(`/api/upload/${id}`);
+      const res = await axiosInstance.get(`/api/upload`,{params:{id}});
+      return res.data.data
     }
   })
   const mutation = useMutation({
@@ -51,7 +55,13 @@ const DocumentUpload = ({id}:{id:string}) => {
 
   return (
     <div className="w-[100%] h-[100%] mx-auto p-1">
-   {  !pdfUrl && 
+            <div className="flex items-center  justify-between ">
+      <DocumentAccordion documents={data} setpfdUrl={setPdfUrl}/>
+                <Button variant="default" onClick={() => setPdfUrl(null)}>
+                    Add 
+                </Button>
+            </div>
+   { !pdfUrl ?
    <>
    <div className="border-2 border-dashed  rounded-lg p-6 text-center  transition">
         <label
@@ -91,12 +101,8 @@ const DocumentUpload = ({id}:{id:string}) => {
         </button>
       </div>
    </>
-
-        }
-
-
-    {
-      pdfUrl &&<>
+   :
+   <>
     <iframe
     src={pdfUrl!}
     className="w-full h-full border"
@@ -104,6 +110,7 @@ const DocumentUpload = ({id}:{id:string}) => {
     ></iframe>
   
     </>
+
     }
     
     </div>

@@ -76,6 +76,19 @@ model Collection {
   description String?
   userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  documents   Documents[]
   createdAt   DateTime @default(now())
 }
 
+
+model Documents {
+  id          String   @id @default(uuid())
+  originalName String
+  key         String
+  url         String
+  bucket      String
+  fileType    String
+  collectionId     String
+  collection        Collection     @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+}

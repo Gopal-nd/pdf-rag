@@ -9,11 +9,16 @@ import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
 
 const worker = new Worker(
   "file-upload-queue",
-  async (job: any) => {
-    let tempFilePath: string | null = null;
+  async (job) => {
+if(job.name ==='file-add'){
 
+  
+  let tempFilePath: string | null = null;
+  
     try {
       const data = JSON.parse(job.data);
+
+      
 
       // Step 1: Download to temp file
       const tempDir = os.tmpdir();
@@ -32,14 +37,14 @@ const worker = new Worker(
         model: "text-embedding-004",
         apiKey: process.env.GOOGLE_API_KEY!,
       });
-
+      console.log(data)
       const vectorStore = await QdrantVectorStore.fromExistingCollection(embeddings, {
         url: "http://localhost:6333",
-        collectionName: "langchain-testing",
+        collectionName: `user-${data.collectionId}`,
       });
 
-      await vectorStore.addDocuments(docs);
-      console.log("✅ Documents added to Qdrant");
+      const result = await vectorStore.addDocuments(docs);
+      console.log("✅ Documents added to Qdrant",result);
     } catch (err) {
       console.error("❌ Error during processing:", err);
     } finally {
@@ -55,7 +60,24 @@ const worker = new Worker(
     }
 
     console.log("📦 Job data:", job.data);
-  },
+  }else if(job.name ==='file-remove'){
+    const data = JSON.parse(job.data);
+    console.log(data)
+    const vectorStore = await QdrantVectorStore.fromExistingCollection(
+      new GoogleGenerativeAIEmbeddings({
+        model: "text-embedding-004",
+        apiKey: process.env.GOOGLE_API_KEY!,
+      }),
+      {
+        url: "http://localhost:6333",
+        collectionName: `user-${data.collectionId}`,
+      }
+    );
+    await vectorStore.delete(data.key)  
+  }
+}
+,
+
   {
     concurrency: 100,
     connection: { host: "localhost", port: 6379 },

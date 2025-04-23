@@ -68,6 +68,21 @@ const Dashboard = () => {
     }
   });
 
+  const deleteMutation = useMutation({
+    mutationFn: async ({ id}: { id: string}) => {
+      const res = await axiosInstance.delete(`api/collections/${id}`,);
+      return res.data;
+    },
+    onSuccess: (res) => {
+      toast.success(res.message);
+      setEditingId(null);
+      refetch();
+    },
+    onError: (error) => {
+      toast.error((error as any).response?.data?.message || 'Something went wrong');
+    }
+  });
+
   return (
     <div className="p-6 space-y-6 mx-auto">
       <div className="flex gap-4 items-center">
@@ -118,6 +133,16 @@ const Dashboard = () => {
                   }}
                 >
                   Edit
+                </Button>
+                <Button
+                 className='w-[100px]'
+                  variant="outline"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteMutation.mutate({ id: col.id });
+                  }}
+                >
+                  Delete
                 </Button>
               </div>
             )}

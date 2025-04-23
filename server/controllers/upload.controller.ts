@@ -2,42 +2,20 @@ import fileUploadQueue from "@/lib/queue";
 import { ApiResponse } from "@/utils/api-response";
 import asyncHandler from "@/utils/async-handler";
 import type { Request, Response } from "express";
-import {getSignedUrl} from '@aws-sdk/s3-request-presigner'
 import fs from 'fs/promises'
-import {GetObjectCommand, S3Client,PutObjectCommand,ListObjectsV2Command, DeleteObjectCommand,} from '@aws-sdk/client-s3'
 import { prisma } from "@/lib/db";
-
-const s3client = new S3Client({
-    region: 'ap-south-1',
-    credentials: {
-     accessKeyId:process.env.AWS_ACCESS_KEY!,
-     secretAccessKey:process.env.AWS_SECRET_KEY!
-    },
-})
-
-async function getObject(key: string) {
-    const command = new GetObjectCommand({
-        Bucket: 'private.gopal',
-        Key: key,
-    });
-    const url = await getSignedUrl(s3client, command);
-    return url
-}
+import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
+import { getObject, s3client } from "@/lib/awss3";
+import { file } from "bun";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 
-async function putObject(key: string,contetType:string) {
-    const command = new PutObjectCommand({
-        Bucket: 'private.gopal',
-        Key: key,
-        ContentType:contetType
-    });
-    const url = await getSignedUrl(s3client, command);
-    return url
-}
+
 
 export const newUpload = asyncHandler(async (req:Request, res:Response) => {
     const file = req.file
-    console.log(req.file)
+    const id = req.body.id
+    console.log('collection is is ',id)
     if(!file) {
         return res.status(400).json(new ApiResponse({
             statusCode: 400,
@@ -58,32 +36,44 @@ export const newUpload = asyncHandler(async (req:Request, res:Response) => {
       });
     
       await s3client.send(command);
-    console.log('deleteing')
-
     if (await fs.exists(file.path)) {
         await fs.unlink(file.path);
       }
     
       const signedURL = await getObject(key)
       console.log('image url is ', signedURL)
-   const respose = await fileUploadQueue.add('file-ready',JSON.stringify({
+
+   const respose = await fileUploadQueue.add('file-add',JSON.stringify({
         filename: req.file?.originalname,
         type: req.file?.mimetype,
         key:key,
-        path: signedURL
+        path: signedURL,
+        user: req.user,
+        collectionId:id
     }))
+    const saveToDB = await prisma.documents.create({
+        data: {
+            originalName: file.originalname,
+            fileType: file.mimetype,
+            bucket: 'private.gopal',
+            key:key,
+            url: signedURL,
+            collectionId:id
+        }
+    })
     // const respose = await putObject('gopal.jpeg','image/jpeg')
-    // console.log(respose)
+    console.log(respose)
     res.json(new ApiResponse({
         statusCode: 200,
-        data: signedURL,
+        data: saveToDB.url,
         message: 'success'
     }));
 });
 
 
 export const getFiles = asyncHandler(async (req:Request, res:Response) => {
-    const id = req.query?.id
+    const id = req.query.id
+    // console.log('collection id is ',id)
     if(!id || typeof id !== 'string') {
         return res.status(400).json(new ApiResponse({
             statusCode: 400,
@@ -92,14 +82,29 @@ export const getFiles = asyncHandler(async (req:Request, res:Response) => {
         }));
     }
 
-    const files = await prisma.file.findMany({
+    const files = await prisma.documents.findMany({
         where: {
-            userId: id
+            collectionId: id
         }
     })
+
+
+    
+    let signedFiles= await Promise.all( files.map(async(file) => {
+        const command = new GetObjectCommand({
+            Bucket: 'private.gopal',
+            Key: file.key,
+        });
+        file.url =await getSignedUrl(s3client, command,{expiresIn:36000})
+        return file
+    })
+)
+
+    
+    // console.log(signedFiles)
     res.json(new ApiResponse({
         statusCode: 200,
-        data: files,
+        data: signedFiles,
         message: 'success'
     }));
 });

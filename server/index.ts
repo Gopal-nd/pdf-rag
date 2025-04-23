@@ -26,6 +26,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/chat', chatRoute);
 app.use('/api/upload',checkAuth, uploadRoute);
+
 app.use('/api/collections',checkAuth, collectionRoute);
 
 

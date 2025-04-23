@@ -10,7 +10,8 @@ const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY });
 
 export const newChat = asyncHandler(async (req, res) => {
     const query = req.query.query as string
-    console.log(query)
+    const id = req.query.id as string
+    console.log(req.query)
     if(!query) {
         return res.status(400).json(new ApiResponse({
             statusCode: 400,
@@ -25,7 +26,7 @@ export const newChat = asyncHandler(async (req, res) => {
       });
     const vectorStore = await QdrantVectorStore.fromExistingCollection(embeddings, {
         url: 'http://localhost:6333',
-        collectionName: "langchain-testing",
+        collectionName: `user-${id}`,
       });
 
       const response = vectorStore.asRetriever({
