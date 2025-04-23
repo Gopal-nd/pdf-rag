@@ -20,7 +20,7 @@ model User {
   age           Int?
   sessions      Session[]
   accounts      Account[]
-
+  collection    Collection[]
   @@unique([email])
   @@map("user")
 }
@@ -69,3 +69,13 @@ model Verification {
 
   @@map("verification")
 }
+
+model Collection {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+}
+

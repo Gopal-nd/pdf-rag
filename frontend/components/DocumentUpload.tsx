@@ -1,23 +1,29 @@
 "use client";
 
 import React, { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "@/lib/axios";
 import { Document, Page, pdfjs } from "react-pdf";
 import { UploadCloud, Loader2 } from "lucide-react";
 import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 import axiosInstance from "@/lib/axios";
 
-// pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
-const DocumentUpload = () => {
+const DocumentUpload = ({id}:{id:string}) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
 
+  const {} = useQuery({
+    queryKey:["documets",id],
+    queryFn: async () => {
+      const res = await axiosInstance.get(`/api/upload/${id}`);
+    }
+  })
   const mutation = useMutation({
     mutationFn: async (file: File) => {
       const formData = new FormData();
       formData.append("document", file);
+      formData.append("id", id);
       const res = await axiosInstance.post("/api/upload/new", formData);
       console.log(res.data.data);
       setPdfUrl(res.data.data);

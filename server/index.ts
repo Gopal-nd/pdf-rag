@@ -2,6 +2,7 @@ import express from "express";
 import type {Request, Response,NextFunction } from "express";
 import chatRoute from "./routes/chat.route";
 import uploadRoute from "./routes/upload.route";
+import collectionRoute from './routes/collections.route';
 import path from 'path';
 import { auth } from "@/lib/auth";
 import cors from "cors"; 
@@ -25,6 +26,8 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/chat', chatRoute);
 app.use('/api/upload',checkAuth, uploadRoute);
+app.use('/api/collections',checkAuth, collectionRoute);
+
 
  
 app.get("/api/me", async (req:Request, res:any) => {

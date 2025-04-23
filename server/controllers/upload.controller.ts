@@ -5,6 +5,7 @@ import type { Request, Response } from "express";
 import {getSignedUrl} from '@aws-sdk/s3-request-presigner'
 import fs from 'fs/promises'
 import {GetObjectCommand, S3Client,PutObjectCommand,ListObjectsV2Command, DeleteObjectCommand,} from '@aws-sdk/client-s3'
+import { prisma } from "@/lib/db";
 
 const s3client = new S3Client({
     region: 'ap-south-1',
@@ -76,6 +77,29 @@ export const newUpload = asyncHandler(async (req:Request, res:Response) => {
     res.json(new ApiResponse({
         statusCode: 200,
         data: signedURL,
+        message: 'success'
+    }));
+});
+
+
+export const getFiles = asyncHandler(async (req:Request, res:Response) => {
+    const id = req.query?.id
+    if(!id || typeof id !== 'string') {
+        return res.status(400).json(new ApiResponse({
+            statusCode: 400,
+            data: null,
+            message: 'id is required'
+        }));
+    }
+
+    const files = await prisma.file.findMany({
+        where: {
+            userId: id
+        }
+    })
+    res.json(new ApiResponse({
+        statusCode: 200,
+        data: files,
         message: 'success'
     }));
 });
