@@ -21,6 +21,7 @@ model User {
   sessions      Session[]
   accounts      Account[]
   collection    Collection[]
+  chats         Chat[]
   @@unique([email])
   @@map("user")
 }
@@ -77,6 +78,7 @@ model Collection {
   userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   documents   Documents[]
+  chats       Chat[]
   createdAt   DateTime @default(now())
 }
 
@@ -91,4 +93,24 @@ model Documents {
   collectionId     String
   collection        Collection     @relation(fields: [collectionId], references: [id], onDelete: Cascade)
   createdAt   DateTime @default(now())
+}
+
+
+model Chat {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  userId    String
+  user      User @relation(fields: [userId], references: [id],onDelete: Cascade)
+  collectionId  String
+  collection  Collection @relation(fields: [collectionId],references: [id], onDelete: Cascade)
+  messages  Message[]
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  chatId    String
+  chat      Chat     @relation(fields: [chatId], references: [id],onDelete: Cascade)
+  role      String   // "user" or "model"
+  content   String
+  createdAt DateTime @default(now())
 }

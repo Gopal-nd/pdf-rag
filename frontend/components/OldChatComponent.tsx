@@ -7,34 +7,37 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { UserCircle, Bot } from 'lucide-react';
 import axiosInstance from '@/lib/axios';
 import ReactMarkdown from 'react-markdown'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 
 const dummyMessages = [
     { type: 'bot', text: 'Hello! How can I help you today?' },
 ];
 
-const ChatComponent = ({ id }: { id: string }) => {
+const OldChatComponent = ({ id,chatId }: { id: string,chatId:string }) => {
   const [messages, setMessages] = useState(dummyMessages);
   const [input, setInput] = useState('');
   const [res, setRes] = useState<any>();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [chatId, setChatId] = useState<string>('');
+
+
+  const {data,isLoading,error} = useQuery({
+    queryKey:["chats",id],
+    queryFn: async () => {
+      const res = await axiosInstance.get(`/api/chat/history`,{params:{chatId}});
+      return res.data
+    }
+  })
+
 
   const mutation = useMutation({
     mutationFn: async (query: string) => {
-      if (!chatId) {
-        const response = await axiosInstance.get(`/api/chat/new`, {
-          params: { id, query }
-        });
-        setChatId(response.data.data.chatId);
-        return response.data.data;
-      } else {
+ 
         const response = await axiosInstance.get(`/api/chat/${chatId}`, {
           params: { id, query }
         });
         return response.data.data;
-      }
+      
     },
     onMutate: async (inputMsg: string) => {
       // Optimistic UI: Add user message
@@ -74,6 +77,10 @@ const ChatComponent = ({ id }: { id: string }) => {
     }
   }, [messages, res]);
 
+  if(isLoading){
+    return <p>Loading...</p>
+  }
+  console.log(data)
   return (
     <div className="flex flex-col h-screen max-w-4xl mx-auto border rounded-md overflow-hidden">
       
@@ -140,4 +147,4 @@ const ChatComponent = ({ id }: { id: string }) => {
   );
 };
 
-export default ChatComponent;
+export default OldChatComponent;

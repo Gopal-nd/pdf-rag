@@ -2,6 +2,7 @@
 import ChatComponent from "@/components/ChatComponent"
 import ChatHistoryOfCollections from "@/components/ChatHistoryOfCollections"
 import DocumentUpload from "@/components/DocumentUpload"
+import OldChatComponent from "@/components/OldChatComponent"
 import {
   ResizableHandle,
   ResizablePanel,
@@ -12,6 +13,7 @@ import { useParams } from "next/navigation"
 export default function ResizableDemo() {
     const params = useParams();
     const id = params.id
+    const chatId = params.chatId
   return (
     <div className="flex-1 h-[calc(100vh-65px)] ">
 
@@ -26,9 +28,10 @@ export default function ResizableDemo() {
       </ResizablePanel >
       <ResizableHandle withHandle />
       <ResizablePanel defaultSize={75}>
-      <ChatHistoryOfCollections id={id as string}/>
+      {/* <ChatHistoryOfCollections id={id as string}/> */}
 
         {/* <ChatComponent id={id as string} /> */}
+        <OldChatComponent id={id as string} chatId={params.chatId as string}/>
     
       </ResizablePanel>
     </ResizablePanelGroup>

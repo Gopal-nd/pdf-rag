@@ -26,9 +26,9 @@ export default function ResizableDemo() {
       </ResizablePanel >
       <ResizableHandle withHandle />
       <ResizablePanel defaultSize={75}>
-      <ChatHistoryOfCollections id={id as string}/>
+      {/* <ChatHistoryOfCollections id={id as string}/> */}
 
-        {/* <ChatComponent id={id as string} /> */}
+        <ChatComponent id={id as string} />
     
       </ResizablePanel>
     </ResizablePanelGroup>
