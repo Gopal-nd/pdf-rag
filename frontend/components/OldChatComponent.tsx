@@ -9,46 +9,48 @@ import axiosInstance from '@/lib/axios';
 import ReactMarkdown from 'react-markdown'
 import { useMutation, useQuery } from '@tanstack/react-query'
 
-const dummyMessages = [
-    { type: 'bot', text: 'Hello! How can I help you today?' },
-];
-
-const OldChatComponent = ({ id,chatId }: { id: string,chatId:string }) => {
-  const [messages, setMessages] = useState(dummyMessages);
+const OldChatComponent = ({ id, chatId }: { id: string, chatId: string }) => {
+  const [messages, setMessages] = useState<{ type: string, text: string }[]>([]);
   const [input, setInput] = useState('');
   const [res, setRes] = useState<any>();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-
-  const {data,isLoading,error} = useQuery({
-    queryKey:["chats",id],
+  const { data: ChatHistory, isLoading } = useQuery({
+    queryKey: ["chat-history", chatId],
     queryFn: async () => {
-      const res = await axiosInstance.get(`/api/chat/history`,{params:{chatId}});
-      return res.data
-    }
-  })
+      const res = await axiosInstance.get(`/api/chat/history/${chatId}`);
+      return res.data.data;
+    },
+    enabled: !!chatId,
+  });
 
+  useEffect(() => {
+    if (ChatHistory && messages.length === 0) {
+      const formatted = ChatHistory.map((msg: any) => ({
+        type: msg.role === 'user' ? 'user' : 'bot',
+        text: msg.content,
+      }));
+      setMessages(formatted);
+    }
+  }, [ChatHistory]);
 
   const mutation = useMutation({
     mutationFn: async (query: string) => {
- 
-        const response = await axiosInstance.get(`/api/chat/${chatId}`, {
-          params: { id, query }
-        });
-        return response.data.data;
-      
+      const response = await axiosInstance.get(`/api/chat/${chatId}`, {
+        params: { id, query }
+      });
+      return response.data.data;
     },
     onMutate: async (inputMsg: string) => {
-      // Optimistic UI: Add user message
-      setMessages(prev => [...prev, { type: 'user', text: inputMsg }]);
-
-      // Add "thinking" bot message
-      setMessages(prev => [...prev, { type: 'bot', text: 'Agent is typing...' }]);
+      setMessages(prev => [
+        ...prev,
+        { type: 'user', text: inputMsg },
+        { type: 'bot', text: 'Agent is typing...' }
+      ]);
     },
     onSuccess: (data) => {
       setRes(data);
-      // Replace "Agent is typing..." with actual response
       setMessages(prev => [
         ...prev.slice(0, -1),
         { type: 'bot', text: data.res }
@@ -77,19 +79,16 @@ const OldChatComponent = ({ id,chatId }: { id: string,chatId:string }) => {
     }
   }, [messages, res]);
 
-  if(isLoading){
-    return <p>Loading...</p>
+  if (isLoading) {
+    return <p className="p-4 text-center">Loading...</p>;
   }
-  console.log(data)
+
   return (
     <div className="flex flex-col h-screen max-w-4xl mx-auto border rounded-md overflow-hidden">
-      
-      {/* Header */}
-      <div className="p-4 border-b text-lg font-semibold ">
+      <div className="p-4 border-b text-lg font-semibold">
         Chat Interface
       </div>
 
-      {/* Scrollable chat area */}
       <div className="flex-1 overflow-hidden">
         <ScrollArea className="h-full px-4 py-2">
           <div className="flex flex-col space-y-4">
@@ -105,18 +104,17 @@ const OldChatComponent = ({ id,chatId }: { id: string,chatId:string }) => {
                     <UserCircle size={24} className="text-blue-500" />
                   </div>
                 )}
-                
+
                 <div
                   className={`px-3 py-2 rounded-lg max-w-xs sm:max-w-sm ${
-                    msg.type === 'user' 
-                    ?' bg-blue-700 text-secondary-foreground font-semibold' 
-                    : ' bg-primary-foreground text-secondary-foreground' 
-
+                    msg.type === 'user'
+                      ? 'bg-blue-700 text-secondary-foreground font-semibold'
+                      : 'bg-primary-foreground text-secondary-foreground'
                   }`}
                 >
                   <span><ReactMarkdown>{msg?.text}</ReactMarkdown></span>
                 </div>
-                
+
                 {msg.type === 'bot' && (
                   <div className="flex-shrink-0 mt-1">
                     <Bot size={24} className="text-gray-500" />
@@ -129,7 +127,6 @@ const OldChatComponent = ({ id,chatId }: { id: string,chatId:string }) => {
         </ScrollArea>
       </div>
 
-      {/* Input area */}
       <div className="p-4 border-t">
         <div className="flex gap-2">
           <Textarea

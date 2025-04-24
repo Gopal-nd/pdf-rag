@@ -268,12 +268,14 @@ export const getChatHistory = asyncHandler(async (req, res) => {
  
   const chatId = req.query.chatId as string
 
-  console.log(req.query)
 
 
-  const history = await prisma.message.findMany({
+  const history = await prisma.chat.findMany({
     where: { 
-      chatId:chatId,
+      id:chatId,
+     },
+     include:{
+      messages:true
      },
     orderBy: { createdAt: "asc" },
   });
@@ -284,5 +286,36 @@ export const getChatHistory = asyncHandler(async (req, res) => {
       message: 'success'
   }));
 });
+
+
+
+
+
+export const test = asyncHandler(async (req, res) => {
+  const chatId = req.params.chatId
+
+  console.log(req.params)
+  console.log('function called ',req.query , "get specific user chat history")
+ 
+  const history = await prisma.chat.findMany({
+    where: { 
+      id:chatId,
+     },
+     include:{
+      messages:true
+     },
+    orderBy: { createdAt: "asc" },
+  });
+
+  // console.log(history)
+
+  res.json(new ApiResponse({
+      statusCode: 200,
+      data: history[0].messages,
+      message: 'success'
+  }));
+});
+
+
 
 

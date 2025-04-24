@@ -36,7 +36,7 @@ const errorHandler = (err: Error | APIError, req: Request, res: Response, next: 
     return res.status(400).json(new ApiResponse({ 
       statusCode: 400, 
       data: null, 
-      message: message,
+      message: message + 'something',
     }));
   }
 
