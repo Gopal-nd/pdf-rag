@@ -22,6 +22,7 @@ model User {
   accounts      Account[]
   collection    Collection[]
   chats         Chat[]
+  apiKey        String?
   @@unique([email])
   @@map("user")
 }

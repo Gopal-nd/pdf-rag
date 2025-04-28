@@ -1,5 +1,5 @@
 'use client'
-import React from 'react'
+import React, { useState } from 'react'
 import { authClient } from '@/lib/auth-client'
 
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
@@ -8,6 +8,13 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Separator } from '@/components/ui/separator'
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert'
 import Logout from '@/components/Logout'
+import { Input } from '@/components/ui/input'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import axiosInstance from '@/lib/axios'
+import { Button } from '@/components/ui/button'
+import { toast } from 'sonner'
+import { useAPIKEY } from '@/store/userApiKey'
+import Link from 'next/link'
 
 
 const Spinner: React.FC = () => (
@@ -19,11 +26,44 @@ const Spinner: React.FC = () => (
 const ProfilePage: React.FC = () => {
   const {
     data: session,
-    isPending,
+    isPending:sessionLoading,
     error,
-    refetch,
-  } = authClient.useSession()
 
+  } = authClient.useSession()
+  const {setKey,key} = useAPIKEY()
+  const [userApiKey,setUserApiKey] = useState('')
+  const {data,refetch,isPending} = useQuery({
+    queryKey:['apikey'],
+    queryFn:async()=>{
+      const res = await axiosInstance.get('/api/apikey')
+      return res.data.data
+    },
+    enabled:userApiKey.length>0 || !key 
+    
+  })
+  const mutate = useMutation({
+    mutationKey:['apikey'],
+    mutationFn:async()=>{
+      const res = await axiosInstance.post('/api/apikey',{key:userApiKey})
+      return res.data.data
+    },
+    onSuccess:(key)=>{
+      console.log(key)
+      setKey(key)
+      console.log(key)
+      toast.success('updated key')
+      refetch()
+    },
+    onError:(err)=>{
+      console.log(err)
+      toast.error('something went wrong, in updating key')
+    }
+  })
+if(isPending || sessionLoading){
+  <div>Loading..</div>
+}
+
+  console.log(data)
   return (
     <div className="p-4 md:p-8 lg:p-12 max-w-3xl mx-auto">
       <Card>
@@ -32,11 +72,7 @@ const ProfilePage: React.FC = () => {
         </CardHeader>
         <Separator />
         <CardContent>
-          {isPending && (
-            <div className="flex justify-center py-8">
-              <Spinner />
-            </div>
-          )}
+
 
           {error && (
             <Alert>
@@ -53,7 +89,7 @@ const ProfilePage: React.FC = () => {
             </Alert>
           )}
 
-          {session && (
+          {session && (<>
             <div className="space-y-6">
               <div className="flex items-center space-x-4">
                 <Avatar className="w-16 h-16">
@@ -103,6 +139,40 @@ const ProfilePage: React.FC = () => {
                 <Logout  />
               </div>
             </div>
+            <div className="mt-8 p-6 border rounded-lg bg-muted">
+  <h2 className="text-xl font-semibold mb-4 inline-block gap-2 mr-2">Your API Key</h2><span className='text-blue-400'><Link target='_blank' href={'https://aistudio.google.com/apikey'}>Get API KEY</Link></span>
+
+  <form
+    onSubmit={(e) => {
+      e.preventDefault();
+      mutate.mutate();
+    }}
+    className="space-y-4"
+  >
+    <div className="space-y-2">
+      <Input
+        placeholder="Enter your Gemini API Key"
+        value={userApiKey || data }
+        onChange={(e) => setUserApiKey(e.target.value)}
+        className="text-sm"
+      />
+      <p className="text-xs text-muted-foreground">
+        This API key will be used for authenticating your requests.
+      </p>
+    </div>
+
+    <Button
+      type="submit"
+      className="w-full"
+      disabled={mutate.isPending}
+    >
+      {mutate.isPending ? 'Updating...' : 'Update API Key'}
+    </Button>
+  </form>
+</div>
+
+          </>
+
           )}
         </CardContent>
       </Card>

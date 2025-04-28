@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import {
   Button
@@ -18,7 +18,9 @@ import {
 } from "@/components/ui/dialog"
 import axiosInstance from '@/lib/axios'
 import { toast } from 'sonner'
-import { redirect } from 'next/navigation'
+import { redirect, useRouter } from 'next/navigation'
+import { useAPIKEY } from '@/store/userApiKey'
+
 
 const fetchCollections = async (query: string) => {
   const res = await axiosInstance.get(`/api/collections?q=${query}`);
@@ -31,6 +33,14 @@ const Dashboard = () => {
   const [form, setForm] = useState({ title: '', description: '' });
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<{ title: string, description: string }>({ title: '', description: '' });
+  const { key, setKey } = useAPIKEY()
+  const router = useRouter()
+  useEffect(()=>{
+
+    if(!key) router.push('/dashboard/account')
+  },[])
+
+
 
   const { data: collections = [], refetch } = useQuery({
     queryKey: ['collections', search],
