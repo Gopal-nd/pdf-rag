@@ -6,21 +6,20 @@ import path from "path";
 import os from "os";
 import { QdrantVectorStore } from "@langchain/qdrant";
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
+import { loadWebDocuments } from "./utils/web-loader";
 
 const worker = new Worker(
   "file-upload-queue",
   async (job) => {
 if(job.name ==='file-add'){
+  console.log(job)
 
   
   let tempFilePath: string | null = null;
   
     try {
       const data = JSON.parse(job.data);
-
-      
-
-      // Step 1: Download to temp file
+      // Step 1: Download file
       const tempDir = os.tmpdir();
       tempFilePath = path.join(tempDir, `${Date.now()}-${data.filename}`);
       const response = await axios.get(data.path, { responseType: "arraybuffer" });
@@ -35,7 +34,7 @@ if(job.name ==='file-add'){
 
       const embeddings = new GoogleGenerativeAIEmbeddings({
         model: "text-embedding-004",
-        apiKey: process.env.GOOGLE_API_KEY!,
+        apiKey: data.user.apiKey!,
       });
       console.log(data)
       const vectorStore = await QdrantVectorStore.fromExistingCollection(embeddings, {
@@ -66,7 +65,7 @@ if(job.name ==='file-add'){
     const vectorStore = await QdrantVectorStore.fromExistingCollection(
       new GoogleGenerativeAIEmbeddings({
         model: "text-embedding-004",
-        apiKey: process.env.GOOGLE_API_KEY!,
+        apiKey: data.user.apiKey!,
       }),
       {
         url: "http://localhost:6333",
@@ -74,10 +73,33 @@ if(job.name ==='file-add'){
       }
     );
     await vectorStore.delete(data.key)  
-  }
-}
-,
+  }else if(job.name=='website-add'){
+    const data = JSON.parse(job.data);
+    // get the job data
+    console.log(data)
+ 
+    // set up for the embedding
+   const embeddings = new GoogleGenerativeAIEmbeddings({
+    model: "text-embedding-004",
+    apiKey: data.user.apiKey!,
+  });
+  // set up for the vector store
+  const vectorStore = await QdrantVectorStore.fromExistingCollection(embeddings, {
+    url: "http://localhost:6333",
+    collectionName: `user-${data.urlId}`,
+  });
+  // for every url 
+  data.urls.map(async(url:string) => {
+    // load the content
+   const response = await loadWebDocuments(url)
+    // store in the vector db
+    const result = await vectorStore.addDocuments(response);
 
+  })
+  console.log('✅ Documents added to Qdrant')
+  }
+
+},
   {
     concurrency: 100,
     connection: { host: "localhost", port: 6379 },

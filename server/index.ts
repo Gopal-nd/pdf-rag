@@ -3,6 +3,9 @@ import type {Request, Response,NextFunction } from "express";
 import chatRoute from "./routes/chat.route";
 import uploadRoute from "./routes/upload.route";
 import collectionRoute from './routes/collections.route';
+import webLoader from './routes/web.route';
+import webLinks from './routes/weblinks.route';
+import webChat from './routes/webchat.route';
 import apiKeyRoute from './routes/api.route'
 import path from 'path';
 import { auth } from "@/lib/auth";
@@ -26,6 +29,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/chat', chatRoute);
+app.use('/api/web-chat', webChat);
+
 app.use('/api/upload',checkAuth, uploadRoute);
 
 app.use('/api/collections',checkAuth, collectionRoute);
@@ -33,7 +38,10 @@ app.use('/api/collections',checkAuth, collectionRoute);
 app.use('/api/apikey',checkAuth,apiKeyRoute)
 
 
- 
+app.use('/api/web-loader',checkAuth, webLoader);
+app.use('/api/web-links', webLinks);
+
+
 app.get("/api/me", async (req:Request, res:any) => {
 	const session = await auth.api.getSession({
 	 headers: fromNodeHeaders(req.headers),

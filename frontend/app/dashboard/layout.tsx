@@ -16,6 +16,9 @@ import {
 
   CircleUser,
   FileText,
+  GlobeIcon,
+  LineChart,
+  Link2,
 
 } from "lucide-react";
 import NavbarProfile from "@/components/NavbarProfile";
@@ -50,6 +53,23 @@ export default function Component({ children }: { children: React.ReactNode }) {
           <span>Home</span>
         </Link>
         
+        <Link
+          href="/dashboard/web-loader"
+          className="flex items-center space-x-2 px-4 py-2 rounded-lg"
+          onClick={handleLinkClick}
+        >
+          <GlobeIcon  className="h-5 w-5 text-primary" />
+          <span>Web Loader</span>
+        </Link>
+           
+        <Link
+          href="/dashboard/web-links"
+          className="flex items-center space-x-2 px-4 py-2 rounded-lg"
+          onClick={handleLinkClick}
+        >
+          <Link2  className="h-5 w-5 text-primary" />
+          <span>Web Links</span>
+        </Link>
         <Link
           href="/dashboard/account"
           className="flex items-center space-x-2 px-4 py-2 rounded-lg"

@@ -2,6 +2,7 @@
 import { useEffect, useState, useRef } from "react";
 import { GoogleGenAI } from "@google/genai";
 import ReactMarkdown from 'react-markdown';
+import { useAPIKEY } from "@/store/userApiKey";
 const apiKey = "AIzaSyDs8u85IWUgyvfY4pikks8-m-yK3grPtCg"; // Replace with your actual key
 
 const ai = new GoogleGenAI({ apiKey });
@@ -15,6 +16,7 @@ export default function App() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const chatRef = useRef<any>(null);
+  const {key} = useAPIKEY()
 
   useEffect(() => {
     const saved = localStorage.getItem("chat_history");
@@ -68,7 +70,7 @@ export default function App() {
 
   return (
     <div className="min-h-screenp-6 flex flex-col">
-      <h1 className="text-2xl font-bold mb-4">Gemini Chat</h1>
+      <h1 className="text-2xl font-bold mb-4">Gemini Chat {key}</h1>
       <div className="flex-1 overflow-y-auto rounded shadow p-4 mb-4">
         {messages.map((msg, i) => (
           <div

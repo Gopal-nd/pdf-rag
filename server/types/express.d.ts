@@ -6,6 +6,7 @@ declare global {
       user?: {
         id: string;
         email?: string;
+        apiKey?: string
       };
     }
   }
@@ -16,6 +17,8 @@ declare module 'express' {
       user?: { 
         id: string;
         email?: string;
+        apiKey?: string
+
        };
     }
   }

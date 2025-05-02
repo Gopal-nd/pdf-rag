@@ -33,11 +33,13 @@ const Dashboard = () => {
   const [form, setForm] = useState({ title: '', description: '' });
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<{ title: string, description: string }>({ title: '', description: '' });
-  const { key, setKey } = useAPIKEY()
+
   const router = useRouter()
   useEffect(()=>{
-
-    if(!key) router.push('/dashboard/account')
+    const key = localStorage.getItem('api-key-storage')
+    console.log(key)
+    const data = JSON.parse(key||'{}')
+    if(!data.state.key) router.push('/dashboard/account')
   },[])
 
 

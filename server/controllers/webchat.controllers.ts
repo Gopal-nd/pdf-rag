@@ -76,16 +76,16 @@ export const newAiChat = asyncHandler(async (req, res) => {
         }));
     }
 
-    const chat = await prisma.chat.create({
+    const webchat = await prisma.webChat.create({
       data:{
-        collectionId:id,
+        urlId:id,
         userId:req.user?.id as string
       }
     });
 
-    await prisma.message.create({
+    await prisma.webMessage.create({
       data: {
-        chatId: chat.id,
+        webChatId: webchat.id,
         role: "user",
         content: query,
       },
@@ -126,16 +126,16 @@ export const newAiChat = asyncHandler(async (req, res) => {
         modelResponse += chunk.text;
       }
 
-      await prisma.message.create({
+      await prisma.webMessage.create({
         data: {
-          chatId: chat.id,
+          webChatId: webchat.id,
           role: "model",
           content: modelResponse,
         },
       });
     res.json(new ApiResponse({
         statusCode: 200,
-        data: {res:modelResponse,docs:result,chatId:chat.id},
+        data: {res:modelResponse,docs:result,chatId:webchat.id},
         message: 'success'
     }));
 });
@@ -159,8 +159,8 @@ export const continueChat = asyncHandler(async (req, res) => {
       }));
   }
 
-  const pastMessages = await prisma.message.findMany({
-    where: { chatId },
+  const pastMessages = await prisma.webMessage.findMany({
+    where: { webChatId:chatId },
     orderBy: { createdAt: "asc" },
   });
 
@@ -172,9 +172,9 @@ export const continueChat = asyncHandler(async (req, res) => {
     })),
   });
 
-  await prisma.message.create({
+  await prisma.webMessage.create({
     data: {
-      chatId,
+      webChatId:chatId,
       role: "user",
       content: query!,
     },
@@ -215,9 +215,9 @@ export const continueChat = asyncHandler(async (req, res) => {
       modelResponse += chunk.text;
     }
 
-    await prisma.message.create({
+    await prisma.webMessage.create({
       data: {
-        chatId,
+        webChatId:chatId,
         role: "model",
         content: modelResponse,
       },
@@ -243,14 +243,14 @@ export const getAllChats = asyncHandler(async (req, res) => {
   console.log('from all chats /all chats of collections ',req.query)
 
 
-  const history = await prisma.chat.findMany({
+  const history = await prisma.webChat.findMany({
     where: { 
-      collectionId:id,
+      urlId:id,
       userId: req.user?.id as string
      },
     orderBy: { createdAt: "asc" },
     include:{
-      messages:true
+      webMessages:true
       
     }
   });
@@ -275,12 +275,12 @@ export const getChatHistory = asyncHandler(async (req, res) => {
 
 
 
-  const history = await prisma.chat.findMany({
+  const history = await prisma.webChat.findMany({
     where: { 
       id:chatId,
      },
      include:{
-      messages:true
+      webMessages:true
      },
     orderBy: { createdAt: "asc" },
   });
@@ -302,12 +302,12 @@ export const test = asyncHandler(async (req, res) => {
   console.log(req.params)
   console.log('function called ',req.query , "get specific user chat history")
  
-  const history = await prisma.chat.findMany({
+  const history = await prisma.webChat.findMany({
     where: { 
       id:chatId,
      },
      include:{
-      messages:true
+      webMessages:true
      },
     orderBy: { createdAt: "asc" },
   });
@@ -316,7 +316,7 @@ export const test = asyncHandler(async (req, res) => {
 
   res.json(new ApiResponse({
       statusCode: 200,
-      data: history[0].messages,
+      data: history[0].webMessages,
       message: 'success'
   }));
 });

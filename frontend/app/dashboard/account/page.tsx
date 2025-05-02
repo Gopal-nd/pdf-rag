@@ -38,7 +38,7 @@ const ProfilePage: React.FC = () => {
       const res = await axiosInstance.get('/api/apikey')
       return res.data.data
     },
-    enabled:userApiKey.length>0 || !key 
+    
     
   })
   const mutate = useMutation({

@@ -22,9 +22,24 @@ model User {
   accounts      Account[]
   collection    Collection[]
   chats         Chat[]
+  urls          Urls[]
+  webChats      WebChat[]
   apiKey        String?
   @@unique([email])
   @@map("user")
+}
+
+model Urls {
+  id          String   @id @default(uuid())
+  url       String
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  allUrls     Json?
+  webChats     WebChat[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([url,userId])
 }
 
 model Session {
@@ -115,3 +130,23 @@ model Message {
   content   String
   createdAt DateTime @default(now())
 }
+
+model WebChat {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  userId    String
+  user      User @relation(fields: [userId], references: [id],onDelete: Cascade)
+  urlId     String
+  url       Urls @relation(fields: [urlId],references: [id], onDelete: Cascade)
+  webMessages  WebMessage[]
+}
+
+model WebMessage {
+  id        String   @id @default(cuid())
+  webChatId    String
+  webChat      WebChat     @relation(fields: [webChatId], references: [id],onDelete: Cascade)
+  role      String   // "user" or "model"
+  content   String
+  createdAt DateTime @default(now())
+}
+
