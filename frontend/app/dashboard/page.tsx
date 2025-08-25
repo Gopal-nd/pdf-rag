@@ -20,6 +20,7 @@ import axiosInstance from '@/lib/axios'
 import { toast } from 'sonner'
 import { redirect, useRouter } from 'next/navigation'
 import { useAPIKEY } from '@/store/userApiKey'
+import { useSearchParams } from 'next/navigation'
 
 
 const fetchCollections = async (query: string) => {
@@ -35,12 +36,13 @@ const Dashboard = () => {
   const [editForm, setEditForm] = useState<{ title: string, description: string }>({ title: '', description: '' });
 
   const router = useRouter()
-  useEffect(()=>{
-    const key = localStorage.getItem('api-key-storage')
-    console.log(key)
-    const data = JSON.parse(key||'{}')
-    if(!data.state.key) router.push('/dashboard/account')
-  },[])
+  const searchParams = useSearchParams()
+  useEffect(() => {
+    const message = searchParams.get('message')
+    if (message) {
+      toast.info(message)
+    }
+  }, [searchParams])
 
 
 
