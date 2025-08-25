@@ -35,20 +35,11 @@ const {data} = useQuery({
        }
         {
           data && data.length!==0 && <div className='flex flex-col gap-2 p-4 rounded-xl'>
+            
           {
             data.map((url: any, index: number) => (
               <div key={index} className='p-2 border'>
                 <h2>{url.url}</h2>
-              <Accordion type="single" collapsible>
-                      <AccordionItem value="item-1">
-                          <AccordionTrigger>See List of URLs {url.allUrls.length}</AccordionTrigger>
-                          <AccordionContent>{
-                          url.allUrls.map((url: string, index: number) => (
-                      <p key={index}><span>{index + 1}. </span> <a className='underline text-blue-600' href={url} target='_blank' rel='noreferrer'>{url}</a></p>
-                        ))}
-                          </AccordionContent>
-                      </AccordionItem>
-                  </Accordion>
                   <Link href={`/dashboard/web-loader/${url.id}`}>
                   <Button >Chat</Button>
                   </Link>

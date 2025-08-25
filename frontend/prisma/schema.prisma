@@ -1,0 +1,150 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model User {
+  id            String    @id
+  name          String
+  email         String
+  emailVerified Boolean
+  image         String?
+  createdAt     DateTime
+  updatedAt     DateTime
+  age           Int?
+  sessions      Session[]
+  accounts      Account[]
+  collection    Collection[]
+  chats         Chat[]
+  urls          Urls[]
+  webChats      WebChat[]
+  apiKey        String?
+  @@unique([email])
+  @@map("user")
+}
+
+model Urls {
+  id          String   @id @default(uuid())
+  url       String
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  allUrls     Json?
+  webChats     WebChat[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([url,userId])
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime
+  updatedAt DateTime
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime
+  updatedAt             DateTime
+
+  @@map("account")
+}
+
+model Verification {
+  id         String    @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+
+  @@map("verification")
+}
+
+model Collection {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  documents   Documents[]
+  chats       Chat[]
+  createdAt   DateTime @default(now())
+}
+
+
+model Documents {
+  id          String   @id @default(uuid())
+  originalName String
+  uploadThingKey String? // UploadThing file key
+  url         String   // UploadThing file URL
+  fileType    String
+  collectionId     String
+  collection        Collection     @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+}
+
+
+model Chat {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  userId    String
+  user      User @relation(fields: [userId], references: [id],onDelete: Cascade)
+  collectionId  String
+  collection  Collection @relation(fields: [collectionId],references: [id], onDelete: Cascade)
+  messages  Message[]
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  chatId    String
+  chat      Chat     @relation(fields: [chatId], references: [id],onDelete: Cascade)
+  messageId String
+  role      String   // "user" or "model"
+  content   String
+  createdAt DateTime @default(now())
+}
+
+model WebChat {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  userId    String
+  user      User @relation(fields: [userId], references: [id],onDelete: Cascade)
+  urlId     String
+  url       Urls @relation(fields: [urlId],references: [id], onDelete: Cascade)
+  webMessages  WebMessage[]
+}
+
+model WebMessage {
+  id        String   @id @default(cuid())
+  webChatId    String
+  webChat      WebChat     @relation(fields: [webChatId], references: [id],onDelete: Cascade)
+  role      String   // "user" or "model"
+  content   String
+  createdAt DateTime @default(now())
+}

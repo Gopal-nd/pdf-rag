@@ -47,23 +47,22 @@ const ProfilePage: React.FC = () => {
       const res = await axiosInstance.post('/api/apikey',{key:userApiKey})
       return res.data.data
     },
-    onSuccess:(key)=>{
-      console.log(key)
-      setKey(key)
-      console.log(key)
-      toast.success('updated key')
+    onSuccess:(response)=>{
+      console.log('API key updated:', response)
+      setKey(userApiKey)
+      toast.success('API key updated successfully')
       refetch()
     },
     onError:(err)=>{
-      console.log(err)
-      toast.error('something went wrong, in updating key')
+      console.log('API key update error:', err)
+      toast.error('Failed to update API key')
     }
   })
 if(isPending || sessionLoading){
   <div>Loading..</div>
 }
 
-  console.log(data)
+  console.log('Current API key data:', data)
   return (
     <div className="p-4 md:p-8 lg:p-12 max-w-3xl mx-auto">
       <Card>
@@ -152,7 +151,7 @@ if(isPending || sessionLoading){
     <div className="space-y-2">
       <Input
         placeholder="Enter your Gemini API Key"
-        value={userApiKey || data }
+        value={userApiKey || data?.apiKey || ''}
         onChange={(e) => setUserApiKey(e.target.value)}
         className="text-sm"
       />

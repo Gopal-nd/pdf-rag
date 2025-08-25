@@ -8,6 +8,8 @@ import { UserCircle, Bot } from 'lucide-react';
 import axiosInstance from '@/lib/axios';
 import ReactMarkdown from 'react-markdown'
 import { useMutation } from '@tanstack/react-query'
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 const dummyMessages = [
     { type: 'bot', text: 'Hello! How can I help you today?' },
@@ -20,6 +22,7 @@ const ChatComponent = ({ id }: { id: string }) => {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [chatId, setChatId] = useState<string>('');
+  const router = useRouter();
 
   const mutation = useMutation({
     mutationFn: async (query: string) => {
@@ -50,6 +53,28 @@ const ChatComponent = ({ id }: { id: string }) => {
         ...prev.slice(0, -1),
         { type: 'bot', text: data.res }
       ]);
+    },
+    onError: (error: any) => {
+      console.log('Chat error:', error);
+      
+      // Check if it's an API key error (401 status)
+      if (error?.response?.status === 401) {
+        const errorData = error.response.data;
+        if (errorData?.data?.redirectTo) {
+          // Show toast message
+          toast.error(errorData.data.message || 'Please add your API key to continue');
+          
+          // Redirect to profile page
+          router.push(errorData.data.redirectTo);
+          return;
+        }
+      }
+      
+      // Handle other errors
+      toast.error(error?.response?.data?.message || 'Something went wrong');
+      
+      // Remove the "Agent is typing..." message on error
+      setMessages(prev => prev.slice(0, -1));
     }
   });
 

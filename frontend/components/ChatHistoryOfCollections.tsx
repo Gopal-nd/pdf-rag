@@ -9,7 +9,7 @@ const ChatHistoryOfCollections = ({id}:{id:string}) => {
     const {data,isLoading,error} = useQuery({
         queryKey:["chats",id],
         queryFn: async () => {
-            const res = await axiosInstance.get(`/api/chat`,{params:{id}});
+            const res = await axiosInstance.get(`/api/chat/all`,{params:{id}});
             return res.data
         }
     })
@@ -43,7 +43,7 @@ const ChatHistoryOfCollections = ({id}:{id:string}) => {
           <Link key={msg.id} href={`/dashboard/${id}/${msg.id}`} className="block">
             <div className=" p-4 rounded-xl shadow-sm  transition duration-150 hover:border">
               <p className=" font-medium line-clamp-1">
-                {msg.messages[0].content} {msg?.messages[1]?.content}
+                {msg.messages[0]?.content} {msg?.messages[1]?.content}
               </p>
             </div>
           </Link>

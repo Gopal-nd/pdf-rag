@@ -27,7 +27,8 @@ const OldChatComponent = ({ id, chatId }: { id: string, chatId: string }) => {
 
   useEffect(() => {
     if (ChatHistory && messages.length === 0) {
-      const formatted = ChatHistory.map((msg: any) => ({
+      console.log(ChatHistory);
+      const formatted = ChatHistory?.messages?.map((msg: any) => ({
         type: msg.role === 'user' ? 'user' : 'bot',
         text: msg.content,
       }));
