@@ -11,7 +11,7 @@ export default async function authMiddleware(request: NextRequest) {
   const isAuthRoute = authRoutes.includes(path);
 
   const origin = nextUrl.origin;
-  const base = process.env.NEXTAUTH_URL || origin;
+  const base = process.env.NEXT_PUBLIC_APP_URL || origin;
   const sessionUrl = `${base.replace(/\/$/, "")}/api/auth/get-session`;
 
   let session: Session | null = null;

@@ -21,7 +21,7 @@ export default function HomePage() {
         <nav className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <FileText className="h-8 w-8 text-blue-600" />
-            <h1 className="text-2xl font-bold text-gray-900">PDF RAG</h1>
+            <h1 className="text-2xl font-bold ">PDF RAG</h1>
           </div>
           <div className="flex items-center gap-4">
             <Link href="/sign-in">
@@ -36,10 +36,10 @@ export default function HomePage() {
 
       {/* Hero Section */}
       <section className="container mx-auto px-6 py-20 text-center">
-        <h1 className="text-5xl font-bold text-black mb-6">
+        <h1 className="text-5xl font-bold  mb-6">
           Chat with Your Documents
         </h1>
-        <p className="text-xl text-black mb-8 max-w-3xl mx-auto">
+        <p className="text-xl  mb-8 max-w-3xl mx-auto">
           Upload PDFs, crawl websites, and have intelligent conversations with your content using AI-powered retrieval-augmented generation.
         </p>
         <div className="flex gap-4 justify-center">
@@ -58,7 +58,7 @@ export default function HomePage() {
 
       {/* Features Section */}
       <section id="features" className="container mx-auto px-6 py-20">
-        <h2 className="text-4xl font-bold text-center  mb-16">
+          <h2 className="text-4xl font-bold text-center mb-16">
           Powerful Features
         </h2>
         
@@ -156,18 +156,18 @@ export default function HomePage() {
       </section>
 
       {/* How It Works */}
-      <section className="container mx-auto px-6 py-20 bg-white">
-        <h2 className="text-4xl font-bold text-center text-gray-900 mb-16">
+      <section className="container mx-auto px-6 py-20 ">
+        <h2 className="text-4xl font-semibold mb-16">
           How It Works
         </h2>
         
         <div className="grid md:grid-cols-3 gap-8">
           <div className="text-center">
-            <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
               <Upload className="h-8 w-8 text-blue-600" />
             </div>
             <h3 className="text-xl font-semibold mb-2">1. Upload Content</h3>
-            <p className="text-gray-600">
+            <p >
               Upload PDF documents or crawl websites to add your content to the system.
             </p>
           </div>
@@ -177,7 +177,7 @@ export default function HomePage() {
               <Zap className="h-8 w-8 text-green-600" />
             </div>
             <h3 className="text-xl font-semibold mb-2">2. AI Processing</h3>
-            <p className="text-gray-600">
+            <p >
               Our AI automatically processes and indexes your content for intelligent retrieval.
             </p>
           </div>
@@ -187,7 +187,7 @@ export default function HomePage() {
               <MessageSquare className="h-8 w-8 text-purple-600" />
             </div>
             <h3 className="text-xl font-semibold mb-2">3. Chat & Learn</h3>
-            <p className="text-gray-600">
+            <p className="text-black">
               Ask questions and get intelligent, context-aware responses from your content.
             </p>
           </div>
@@ -196,10 +196,10 @@ export default function HomePage() {
 
       {/* CTA Section */}
       <section className="container mx-auto px-6 py-20 text-center">
-        <h2 className="text-4xl font-bold text-gray-900 mb-6">
+        <h2 className="text-4xl font-semibold mb-6">
           Ready to Get Started?
         </h2>
-        <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+        <p className="text-xl text-black mb-8 max-w-2xl mx-auto">
           Join thousands of users who are already chatting with their documents and websites.
         </p>
         <Link href="/sign-in">
@@ -210,19 +210,19 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
+        <footer className=" py-12">
         <div className="container mx-auto px-6 text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
             <FileText className="h-6 w-6" />
             <h3 className="text-xl font-bold">PDF RAG</h3>
           </div>
-          <p className="text-gray-400 mb-4">
+                <p className=" mb-4">
             Intelligent document chat powered by AI
           </p>
-          <div className="flex items-center justify-center gap-6 text-sm text-gray-400">
+          <div className="flex items-center justify-center gap-6 text-sm ">
             <span>© 2025 PDF RAG. All rights reserved.</span>
-            <Link href="/privacy" className="hover:text-white">Privacy</Link>
-            <Link href="/terms" className="hover:text-white">Terms</Link>
+            <Link href="/privacy" >Privacy</Link>
+            <Link href="/terms" >Terms</Link>
       </div>
       </div>
       </footer>
