@@ -20,7 +20,6 @@ import axiosInstance from '@/lib/axios'
 import { toast } from 'sonner'
 import { redirect, useRouter } from 'next/navigation'
 import { useAPIKEY } from '@/store/userApiKey'
-import { useSearchParams } from 'next/navigation'
 
 
 const fetchCollections = async (query: string) => {
@@ -36,13 +35,15 @@ const Dashboard = () => {
   const [editForm, setEditForm] = useState<{ title: string, description: string }>({ title: '', description: '' });
 
   const router = useRouter()
-  const searchParams = useSearchParams()
+  // Read query param client-side to avoid Suspense requirement
   useEffect(() => {
-    const message = searchParams.get('message')
-    if (message) {
-      toast.info(message)
-    }
-  }, [searchParams])
+    try {
+      if (typeof window === 'undefined') return;
+      const params = new URLSearchParams(window.location.search);
+      const message = params.get('message');
+      if (message) toast.info(message);
+    } catch {}
+  }, [])
 
 
 
