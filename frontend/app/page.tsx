@@ -15,7 +15,7 @@ import {
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen ">
       {/* Header */}
       <header className="container mx-auto px-6 py-8">
         <nav className="flex items-center justify-between">
@@ -36,10 +36,10 @@ export default function HomePage() {
 
       {/* Hero Section */}
       <section className="container mx-auto px-6 py-20 text-center">
-        <h1 className="text-5xl font-bold text-gray-900 mb-6">
+        <h1 className="text-5xl font-bold text-black mb-6">
           Chat with Your Documents
         </h1>
-        <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+        <p className="text-xl text-black mb-8 max-w-3xl mx-auto">
           Upload PDFs, crawl websites, and have intelligent conversations with your content using AI-powered retrieval-augmented generation.
         </p>
         <div className="flex gap-4 justify-center">
@@ -58,7 +58,7 @@ export default function HomePage() {
 
       {/* Features Section */}
       <section id="features" className="container mx-auto px-6 py-20">
-        <h2 className="text-4xl font-bold text-center text-gray-900 mb-16">
+        <h2 className="text-4xl font-bold text-center  mb-16">
           Powerful Features
         </h2>
         
