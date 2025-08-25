@@ -6,16 +6,25 @@ import { join } from 'path';
 import { tmpdir } from 'os';
 import { AdvancedDocumentProcessor } from './advanced-document-processor';
 
-// Redis connection with optimized settings
-const connection = {
-  host: process.env.REDIS_HOST || 'localhost',
-  port: parseInt(process.env.REDIS_PORT || '6379'),
-  password: process.env.REDIS_PASSWORD,
-  maxRetriesPerRequest: 3,
-  retryDelayOnFailover: 100,
-  enableReadyCheck: false,
-  maxLoadingTimeout: 10000,
-};
+// Resolve Redis connection from cloud envs
+const redisUrl = process.env.REDIS_URL || process.env.UPSTASH_REDIS_URL || process.env.REDIS_TLS_URL;
+
+if (!redisUrl && process.env.NODE_ENV !== 'development') {
+  console.warn('Redis URL is not configured. Set REDIS_URL or UPSTASH_REDIS_URL to enable queues.');
+}
+
+// Redis connection with cloud-first settings
+const connection = redisUrl
+  ? { url: redisUrl, maxRetriesPerRequest: null as unknown as number | null }
+  : {
+      host: process.env.REDIS_HOST || '127.0.0.1',
+      port: parseInt(process.env.REDIS_PORT || '6379'),
+      password: process.env.REDIS_PASSWORD,
+      maxRetriesPerRequest: null as unknown as number | null,
+      retryDelayOnFailover: 100,
+      enableReadyCheck: false,
+      maxLoadingTimeout: 10000,
+    };
 
 // Create queues with optimized settings
 export const fileUploadQueue = new Queue('file-upload', { 
