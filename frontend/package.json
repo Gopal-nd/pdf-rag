@@ -10,7 +10,8 @@
     "setup": "bun run scripts/setup.ts",
     "db:generate": "bunx prisma generate",
     "db:push": "bunx prisma db push",
-    "db:studio": "bunx prisma studio"
+    "db:studio": "bunx prisma studio",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@google/genai": "^0.10.0",
